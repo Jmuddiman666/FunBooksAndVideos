@@ -36,27 +36,24 @@ public class PurchaseOrderProcessor : IOrderProcessor
     public async Task ProcessOrder(PurchaseOrder purchaseOrder)
     {
         //Check order is valid
-        if (!purchaseOrder.ItemLines.Any()) throw new Exception("No items to process");
+        if (!purchaseOrder.ItemLines.Any()) throw new("No items to process");
 
-        async void HandleItem(ItemLine itemLine)
+
+        foreach (var itemLine in purchaseOrder.ItemLines.ToList())
         {
             switch (itemLine.Product)
             {
                 case ProductType.Book:
                 case ProductType.Video:
-                    await _productService.GenerateShippingSlip(purchaseOrder);
+                    await _productService.GenerateShippingSlip(new ValueTuple<int, int, ItemLine>(purchaseOrder.Id, purchaseOrder.CustomerId, itemLine));
                     break;
                 case ProductType.Membership:
-                    await _membershipService.ActivateMembership(purchaseOrder);
+                    await _membershipService.ActivateMembership(new ValueTuple<int, int, ItemLine>(purchaseOrder.Id, purchaseOrder.CustomerId, itemLine));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        purchaseOrder.ItemLines
-                     .ToList()
-                     .ForEach(HandleItem);
     }
 
     #endregion

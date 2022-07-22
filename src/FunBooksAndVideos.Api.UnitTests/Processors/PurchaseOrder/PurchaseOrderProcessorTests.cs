@@ -21,8 +21,8 @@ public class PurchaseOrderProcessorTests : ITest<PurchaseOrderProcessor>
 
     public PurchaseOrderProcessorTests()
     {
-        _membershipServiceMock = new Mock<IMembershipService>();
-        _productServiceMock = new Mock<IProductService>();
+        _membershipServiceMock = new();
+        _productServiceMock = new();
     }
 
     #endregion
@@ -68,14 +68,17 @@ public class PurchaseOrderProcessorTests : ITest<PurchaseOrderProcessor>
                                             new(ProductType.Membership, "Book Club Membership")
                                         }
                         };
-        _membershipServiceMock.Setup(x => x.ActivateMembership(fakeOrder)).Verifiable();
+        (int id, int customerId, ItemLine itemLine) request = new(fakeOrder.Id, fakeOrder.CustomerId, fakeOrder.ItemLines[0]);
+        _membershipServiceMock.Setup(x => x.ActivateMembership(request))
+                              .Verifiable();
 
         //Act
         await sut.ProcessOrder(fakeOrder);
 
         //Assert
-        _membershipServiceMock.Verify(x => x.ActivateMembership(fakeOrder), Times.Once);
-        _productServiceMock.Verify(x => x.GenerateShippingSlip(fakeOrder), Times.Never);
+        _membershipServiceMock.Verify(x => x.ActivateMembership(request),
+                                      Times.Once);
+        _productServiceMock.Verify(x => x.GenerateShippingSlip(request), Times.Never);
     }
 
 
@@ -103,14 +106,16 @@ public class PurchaseOrderProcessorTests : ITest<PurchaseOrderProcessor>
                                             new(ProductType.Book, "The Girl on the train")
                                         }
                         };
-        _productServiceMock.Setup(x => x.GenerateShippingSlip(fakeOrder)).Verifiable();
+        (int id, int customerId, ItemLine itemLine) request = new(fakeOrder.Id, fakeOrder.CustomerId, fakeOrder.ItemLines[0]);
+        _productServiceMock.Setup(x => x.GenerateShippingSlip(request)).Verifiable();
 
         //Act
         await sut.ProcessOrder(fakeOrder);
 
         //Assert
-        _membershipServiceMock.Verify(x => x.ActivateMembership(fakeOrder), Times.Never);
-        _productServiceMock.Verify(x => x.GenerateShippingSlip(fakeOrder), Times.AtLeastOnce);
+        _membershipServiceMock.Verify(x => x.ActivateMembership(new ValueTuple<int, int, ItemLine>(fakeOrder.Id, fakeOrder.CustomerId, It.IsAny<ItemLine>())),
+                                      Times.Never);
+        _productServiceMock.Verify(x => x.GenerateShippingSlip(request), Times.AtLeastOnce);
     }
 
     #region Implementation of ITest<out PurchaseOrderProcessor>

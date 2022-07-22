@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Text.Json.Serialization;
-using FunBooksAndVideos.Api.Extensions;
 
 namespace FunBooksAndVideos.Api.Models;
 
@@ -44,16 +43,12 @@ public class PurchaseOrder
 /// <param name="Product"></param>
 public record ItemLine(ProductType Product, string ProductName)
 {
-    #region Public Methods
-
-    public override string ToString()
-    {
-        return Product == ProductType.Membership
-                   ? ProductName
-                   : $"{Product.GetDescription()} \"{ProductName}\"";
-    }
-
-    #endregion
+    //public override string ToString()
+    //{
+    //    return Product == ProductType.Membership
+    //               ? ProductName
+    //               : $"{Product.GetDescription()} \"{ProductName}\"";
+    //}
 }
 
 /// <summary>

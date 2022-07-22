@@ -13,7 +13,7 @@ public interface IProductService
     ///     Generate a new shipping slip for the request purchase.
     /// </summary>
     /// <param name="purchaseOrder">The purchase order to process.</param>
-    Task GenerateShippingSlip(PurchaseOrder purchaseOrder);
+    Task GenerateShippingSlip((int id, int customerId, ItemLine itemLine) purchaseOrder);
 
     #endregion
 }

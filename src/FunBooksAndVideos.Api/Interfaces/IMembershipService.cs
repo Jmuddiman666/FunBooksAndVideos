@@ -12,7 +12,7 @@ public interface IMembershipService
     /// <summary>
     ///     Activate the the requested membership
     /// </summary>
-    Task ActivateMembership(PurchaseOrder purchaseOrder);
+    Task ActivateMembership((int id, int customerId, ItemLine itemLine) purchaseOrder);
 
     #endregion
 }
